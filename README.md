@@ -96,6 +96,19 @@ Sentinel memilih domain dari isi pertanyaan melalui `src/sentinel-registry.js`, 
 
 Pola nyata harus disimpan sebagai file `.jsonl` di folder domain yang sesuai. Jalankan `npm run patterns:build` untuk memvalidasi record, membuat token index per domain, dan menghasilkan statistik di `indexes/registry.json`. Builder menolak record tanpa sumber, confidence, domain, problem, atau solution; builder tidak membuat data sintetis.
 
+## Xentinel Docker Compose dengan Ollama
+
+Arsitektur container tersedia di `docker-compose.yml`. Service `ollama` menjalankan model `llama3.2:3b` pada port `11434`, service `api` menjalankan FastAPI orchestrator pada port `8000`, dan service `web` menyajikan UI Xentinel pada port `3000`. FastAPI membaca `internet-shard-manifest.json`, menampilkan 30 shard RAA, memilih shard yang relevan secara deterministik, lalu mengirim konteks percakapan ke Ollama.
+
+Jalankan stack dengan perintah berikut:
+
+```bash
+docker compose up -d --build
+docker compose exec ollama ollama pull llama3.2:3b
+```
+
+Buka `http://localhost:3000`. Pemeriksaan status tersedia di `http://localhost:8000/api/health`, sedangkan daftar shard tersedia di `http://localhost:8000/api/shards`. Variabel `OLLAMA_MODEL` dapat diganti, contohnya `OLLAMA_MODEL=qwen2.5:7b docker compose up -d --build`. Untuk domain publik seperti `api.frostbyte.com`, arahkan reverse proxy HTTPS ke service `web:3000`; jangan mengekspos port Ollama ke internet secara langsung.
+
 ## Xentinel dengan Ollama sebagai otak chat
 
 Endpoint teks (`/api/chat`, `/api/translate`, dan `/api/video/prompt`) sekarang menggunakan **Ollama** melalui HTTP API `POST /api/chat`. Endpoint analisis evidence tetap deterministik dan endpoint gambar tetap menggunakan Workers AI karena Ollama tidak menyediakan pengganti langsung untuk pipeline gambar yang sudah ada.
