@@ -1,4 +1,6 @@
-# A Core Raa
+# Xentinel
+
+> Xentinel adalah branding publik untuk engine A Core Raa.
 
 **A Core Raa** adalah engine intelligence untuk analisis evidence resource game web dan chat tugas sehari-hari. Mode evidence tetap offline-deterministik; mode chat menggunakan Ollama melalui endpoint HTTP yang dikonfigurasi.
 
@@ -94,7 +96,7 @@ Sentinel memilih domain dari isi pertanyaan melalui `src/sentinel-registry.js`, 
 
 Pola nyata harus disimpan sebagai file `.jsonl` di folder domain yang sesuai. Jalankan `npm run patterns:build` untuk memvalidasi record, membuat token index per domain, dan menghasilkan statistik di `indexes/registry.json`. Builder menolak record tanpa sumber, confidence, domain, problem, atau solution; builder tidak membuat data sintetis.
 
-## Menggunakan Ollama sebagai otak chat
+## Xentinel dengan Ollama sebagai otak chat
 
 Endpoint teks (`/api/chat`, `/api/translate`, dan `/api/video/prompt`) sekarang menggunakan **Ollama** melalui HTTP API `POST /api/chat`. Endpoint analisis evidence tetap deterministik dan endpoint gambar tetap menggunakan Workers AI karena Ollama tidak menyediakan pengganti langsung untuk pipeline gambar yang sudah ada.
 
