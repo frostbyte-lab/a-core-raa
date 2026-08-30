@@ -1,0 +1,14 @@
+{
+  "name": "a-core-raa",
+  "version": "0.2.0",
+  "description": "Standalone evidence intelligence engine and Cloudflare Worker dashboard.",
+  "type": "module",
+  "private": true,
+  "scripts": {
+    "test": "node --test tests/*.test.mjs",
+    "analyze": "node src/araa-cli.mjs",
+    "deploy": "wrangler deploy"
+  },
+  "engines": { "node": ">=20" },
+  "devDependencies": { "wrangler": "^4.0.0" }
+}
