@@ -53,3 +53,9 @@ Tahap berikutnya dapat menambahkan parser evidence adapters, root-cause graph, c
 ## Status
 
 Repository ini merupakan fondasi AI domain-spesifik mandiri. Ia bukan klaim bahwa sistem lebih pintar dari seluruh model AI umum; targetnya adalah analisis game-resource yang konsisten, dapat diaudit, aman, dan teliti.
+
+## Cloudflare deployment
+
+Repository canonical deployment adalah `frostbyte-lab/a-core-raa`. Worker terisolasi sudah live di https://a-core-raa-cloud.technologiesfrostbyte.workers.dev dan menyediakan `GET /api/health` serta `POST /api/analyze`. Worker tidak mengambil atau mengeksekusi URL yang dikirim pengguna.
+
+Workflow GitHub Actions tersedia untuk deployment otomatis setiap push ke `main`. Agar workflow otomatis dapat berjalan, tambahkan repository Actions secrets `CLOUDFLARE_API_TOKEN` dan `CLOUDFLARE_ACCOUNT_ID` melalui GitHub Repository Settings atau Git integration Cloudflare. Deployment langsung sudah diverifikasi; token integrasi GitHub pada sesi ini tidak memiliki izin menulis Actions secrets dan mengembalikan HTTP 403.
