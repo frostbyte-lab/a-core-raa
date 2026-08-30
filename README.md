@@ -1,6 +1,6 @@
 # A Core Raa
 
-**A Core Raa** adalah engine intelligence untuk analisis evidence resource game web dan chat tugas sehari-hari. Mode evidence tetap offline-deterministik; mode chat menggunakan binding resmi Cloudflare Workers AI.
+**A Core Raa** adalah engine intelligence untuk analisis evidence resource game web dan chat tugas sehari-hari. Mode evidence tetap offline-deterministik; mode chat menggunakan Ollama melalui endpoint HTTP yang dikonfigurasi.
 
 > A Core Raa tidak menebak isi game. Ia hanya membuat kesimpulan dari evidence yang diberikan, mencocokkan pola lokal, memberi tingkat risiko, dan menjelaskan tindakan yang aman.
 
@@ -51,7 +51,7 @@ Indeks baru memetakan token indikator ke kandidat pola menggunakan `Uint32Array`
 
 ## Prinsip keamanan
 
-Mode evidence A Core Raa berjalan offline dan tidak melakukan fetch otomatis. Mode chat hanya mengirim riwayat percakapan yang dibatasi ke Workers AI melalui binding Cloudflare; credential-like fields tetap dilarang dan tidak disimpan. Credential-like fields di-redact sebelum diproses. CAPTCHA, DRM, protected resource, dan kontrol akses tidak dilewati. Evidence tidak dianggap sebagai instruksi eksekusi. Input dibatasi kedalaman, panjang string, jumlah array, dan jumlah object key untuk mengurangi risiko resource exhaustion.
+Mode evidence A Core Raa berjalan offline dan tidak melakukan fetch otomatis. Mode chat hanya mengirim riwayat percakapan yang dibatasi ke Ollama melalui endpoint yang dikonfigurasi; credential-like fields tetap dilarang dan tidak disimpan. Credential-like fields di-redact sebelum diproses. CAPTCHA, DRM, protected resource, dan kontrol akses tidak dilewati. Evidence tidak dianggap sebagai instruksi eksekusi. Input dibatasi kedalaman, panjang string, jumlah array, dan jumlah object key untuk mengurangi risiko resource exhaustion.
 
 ## Roadmap
 
@@ -93,3 +93,38 @@ Sentinel memilih domain dari isi pertanyaan melalui `src/sentinel-registry.js`, 
 ### Build index pola
 
 Pola nyata harus disimpan sebagai file `.jsonl` di folder domain yang sesuai. Jalankan `npm run patterns:build` untuk memvalidasi record, membuat token index per domain, dan menghasilkan statistik di `indexes/registry.json`. Builder menolak record tanpa sumber, confidence, domain, problem, atau solution; builder tidak membuat data sintetis.
+
+## Menggunakan Ollama sebagai otak chat
+
+Endpoint teks (`/api/chat`, `/api/translate`, dan `/api/video/prompt`) sekarang menggunakan **Ollama** melalui HTTP API `POST /api/chat`. Endpoint analisis evidence tetap deterministik dan endpoint gambar tetap menggunakan Workers AI karena Ollama tidak menyediakan pengganti langsung untuk pipeline gambar yang sudah ada.
+
+Atur variabel berikut saat menjalankan Worker:
+
+```bash
+npx wrangler dev --var OLLAMA_BASE_URL:http://127.0.0.1:11434 --var OLLAMA_MODEL:qwen2.5:7b
+```
+
+Pastikan model sudah tersedia di komputer yang menjalankan Ollama:
+
+```bash
+ollama pull qwen2.5:7b
+ollama serve
+```
+
+Untuk deployment Cloudflare, `OLLAMA_BASE_URL` harus berupa URL **HTTPS yang dapat dijangkau dari internet**, bukan `localhost` atau `127.0.0.1`. Jika server Ollama dilindungi proxy, token opsional dapat disimpan sebagai secret:
+
+```bash
+npx wrangler secret put OLLAMA_API_KEY
+```
+
+Model default adalah `llama3.2:3b`; ganti dengan model yang sesuai RAM/GPU server, misalnya `qwen2.5:7b`. Jangan mengekspos port Ollama secara langsung tanpa autentikasi dan pembatasan akses.
+
+### Pilihan arsitektur
+
+| Pendekatan | Tradeoff | Biaya | Kompleksitas setup |
+| --- | --- | --- | --- |
+| Worker Cloudflare → Ollama melalui HTTPS | Dapat diakses publik, tetapi server Ollama harus online dan diamankan | Biaya server/GPU Ollama | Sedang |
+| Jalankan Worker dan Ollama di mesin yang sama | Latensi rendah dan cocok untuk pengembangan lokal, tetapi tidak cocok untuk Worker Cloudflare publik | Infrastruktur lokal | Rendah |
+| Tetap memakai Workers AI | Tidak perlu mengelola server model, tetapi bukan model lokal Ollama | Mengikuti penggunaan Workers AI | Paling rendah |
+
+Respons chat tetap kompatibel dengan frontend lama dan kini menambahkan `provider: "ollama"` serta nama model yang digunakan. Jika `OLLAMA_BASE_URL` tidak diatur, endpoint teks mengembalikan status `503` dengan pesan konfigurasi yang jelas.

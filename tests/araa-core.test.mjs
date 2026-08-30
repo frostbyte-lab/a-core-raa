@@ -5,13 +5,27 @@ import { ARAA_CASE_DATASET, ARAA_DATASET_VERSION, ARAA_PATTERN_CAPACITY, getAraa
 import { createAraaPatternIndex } from '../src/araa-pattern-index.js';
 import worker from '../src/worker.js';
 
-test('chat endpoint answers everyday greetings through Workers AI', async () => {
-  const request = new Request('https://example.test/api/chat', { method: 'POST', body: JSON.stringify({ messages: [{ role: 'user', content: 'Halo' }] }) });
-  const response = await worker.fetch(request, { AI: { run: async (model, input) => ({ response: `Hai dari ${model}: ${input.messages.at(-1).content}` }) } });
-  const body = await response.json();
-  assert.equal(response.status, 200);
-  assert.equal(body.ok, true);
-  assert.match(body.message.content, /Halo/);
+test('chat endpoint answers everyday greetings through Ollama', async () => {
+  const originalFetch = globalThis.fetch;
+  let received;
+  globalThis.fetch = async (url, options) => {
+    received = { url, options };
+    return new Response(JSON.stringify({ message: { content: 'Hai dari Ollama: Halo' } }), { status: 200, headers: { 'content-type': 'application/json' } });
+  };
+  try {
+    const request = new Request('https://example.test/api/chat', { method: 'POST', body: JSON.stringify({ messages: [{ role: 'user', content: 'Halo' }] }) });
+    const response = await worker.fetch(request, { OLLAMA_BASE_URL: 'http://ollama.test:11434', OLLAMA_MODEL: 'qwen2.5:7b' });
+    const body = await response.json();
+    assert.equal(response.status, 200);
+    assert.equal(body.ok, true);
+    assert.equal(body.provider, 'ollama');
+    assert.equal(body.model, 'qwen2.5:7b');
+    assert.match(body.message.content, /Halo/);
+    assert.equal(received.url, 'http://ollama.test:11434/api/chat');
+    assert.equal(JSON.parse(received.options.body).stream, false);
+  } finally {
+    globalThis.fetch = originalFetch;
+  }
 });
 
 test('v1 API requires API key and accepts Bearer key', async () => {
@@ -21,9 +35,9 @@ test('v1 API requires API key and accepts Bearer key', async () => {
   assert.equal(authenticated.status, 200);
 });
 
-test('chat endpoint refuses empty messages without AI call', async () => {
+test('chat endpoint refuses empty messages without Ollama call', async () => {
   const request = new Request('https://example.test/api/chat', { method: 'POST', body: JSON.stringify({ messages: [] }) });
-  const response = await worker.fetch(request, { AI: { run: async () => ({ response: 'unexpected' }) } });
+  const response = await worker.fetch(request, { OLLAMA_BASE_URL: 'http://ollama.test:11434' });
   assert.equal(response.status, 400);
 });
 
