@@ -1,19 +1,21 @@
 {
   "version": "0.2.0",
-  "generatedAt": "2026-08-30T14:02:37.685Z",
+  "generatedAt": "2026-08-30T16:14:29.748Z",
   "targetTotalPatterns": 300000000,
   "scope": "coding",
   "domains": {
     "coding": {
       "domain": "coding",
       "targetPatterns": 300000000,
-      "records": 0,
+      "records": 7000,
       "invalidRecords": 0,
-      "tokenCount": 0,
-      "sourceFiles": [],
+      "tokenCount": 7757,
+      "sourceFiles": [
+        "data/coding/coding-internet-000001.jsonl"
+      ],
       "storage": "jsonl-stream"
     }
   },
-  "totalRecords": 0,
+  "totalRecords": 7000,
   "invalidRecords": 0
 }
