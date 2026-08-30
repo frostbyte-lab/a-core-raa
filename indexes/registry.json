@@ -1,34 +1,17 @@
 {
-  "version": "0.1.0",
-  "generatedAt": "2026-08-30T12:37:58.122Z",
+  "version": "0.2.0",
+  "generatedAt": "2026-08-30T13:57:22.767Z",
+  "targetTotalPatterns": 20000000,
+  "scope": "coding",
   "domains": {
-    "general": {
-      "domain": "general",
-      "records": 0,
-      "invalidRecords": 0,
-      "tokenCount": 0,
-      "sourceFiles": []
-    },
-    "automotive": {
-      "domain": "automotive",
-      "records": 0,
-      "invalidRecords": 0,
-      "tokenCount": 0,
-      "sourceFiles": []
-    },
-    "image": {
-      "domain": "image",
-      "records": 0,
-      "invalidRecords": 0,
-      "tokenCount": 0,
-      "sourceFiles": []
-    },
     "coding": {
       "domain": "coding",
+      "targetPatterns": 20000000,
       "records": 0,
       "invalidRecords": 0,
       "tokenCount": 0,
-      "sourceFiles": []
+      "sourceFiles": [],
+      "storage": "jsonl-stream"
     }
   },
   "totalRecords": 0,

@@ -1,7 +1,9 @@
 {
   "domain": "coding",
+  "targetPatterns": 20000000,
   "records": 0,
   "invalidRecords": 0,
   "tokenCount": 0,
-  "sourceFiles": []
+  "sourceFiles": [],
+  "storage": "jsonl-stream"
 }

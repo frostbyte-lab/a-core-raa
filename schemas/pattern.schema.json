@@ -1,11 +1,12 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "title": "A Core Sentinel Pattern",
+  "title": "A Core Sentinel Pattern v0.2",
   "type": "object",
   "required": ["id", "domain", "tags", "problem", "solution", "source", "confidence", "version"],
+  "description": "Validated, source-attributed pattern record for the 40M three-domain corpus.",
   "properties": {
     "id": { "type": "string", "minLength": 3 },
-    "domain": { "enum": ["general", "automotive", "image", "coding"] },
+    "domain": { "enum": ["general", "automotive", "coding"] },
     "tags": { "type": "array", "items": { "type": "string" }, "minItems": 1 },
     "problem": { "type": "string", "minLength": 1 },
     "solution": { "type": "string", "minLength": 1 },

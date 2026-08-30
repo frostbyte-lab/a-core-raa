@@ -8,7 +8,7 @@
 
 Engine melakukan redaction terhadap credential, membaca manifest dan metadata capture, menghitung missing asset, memeriksa error, resource protected, integrity/hash, dependency graph, API map, ukuran paket, serta mencocokkan evidence dengan dataset lokal. Matcher sekarang menggunakan compact inverted-token index, sehingga tidak perlu memindai setiap pola untuk setiap evidence.
 
-Dataset saat ini berisi 50 pola game-web lintas network, asset, runtime, offline, API, security, capture, packaging, compatibility, dan performance, termasuk G1006, CORS, asset 404, WebAssembly, rate limit, timeout API, mixed content, CSP, HAR tidak lengkap, manifest invalid, mobile capability, memory pressure, dan CPU pressure.
+Dataset inti saat ini berisi 50 pola game-web lintas network, asset, runtime, offline, API, security, capture, packaging, compatibility, dan performance. Fondasi Sentinel ditetapkan untuk tiga domain: 20.000.000 pola coding, 10.000.000 pola otomotif, dan 10.000.000 pola umum.
 
 ## Struktur
 
@@ -43,7 +43,7 @@ Input CLI harus berupa JSON evidence. Contoh minimal:
 }
 ```
 
-Laporan berisi `score`, `level`, `findings`, `priorities`, `dataset.version`, `dataset.caseCount`, `dataset.capacity`, `dataset.stats`, `dataset.matched`, dan `explainability`. `dataset.caseCount` adalah jumlah pola yang benar-benar dimuat; `dataset.capacity` menyatakan kapasitas desain indeks sebesar 3.000.000 pola, bukan klaim bahwa tiga juta pengetahuan domain sudah tersedia di repository. File output ditulis dengan permission `0600` oleh CLI.
+Laporan berisi `score`, `level`, `findings`, `priorities`, `dataset.version`, `dataset.caseCount`, `dataset.capacity`, `dataset.stats`, `dataset.matched`, dan `explainability`. `dataset.caseCount` adalah jumlah pola inti yang benar-benar dimuat; kapasitas Sentinel 40.000.000 pola dikelola melalui shard domain dan indeks selektif, bukan dimuat seluruhnya ke bundle atau RAM. File output ditulis dengan permission `0600` oleh CLI.
 
 ## Skala pola
 
@@ -84,9 +84,9 @@ Endpoint versioned yang tersedia adalah `/api/v1/chat`, `/api/v1/analyze`, `/api
 
 ## A Core Sentinel sebagai repository induk
 
-Repository ini adalah induk A Core Sentinel dengan empat domain: `general`, `automotive`, `image`, dan `coding`. Registry pusat berada di `sentinel-registry.json`, schema pola berada di `schemas/pattern.schema.json`, dan dataset domain disiapkan di `data/` dengan index terpisah di `indexes/`.
+Repository ini adalah induk A Core Sentinel dengan tiga domain: `coding`, `automotive`, dan `general`. Registry pusat berada di `sentinel-registry.json`, schema pola berada di `schemas/pattern.schema.json`, dan dataset domain disiapkan di `data/` dengan index terpisah di `indexes/`. Rincian kuota serta format impor tersedia di `DATASET-40M-PLAN.md`.
 
-Target arsitektur saat ini adalah 4.000.000 pola, yaitu 1.000.000 pola per domain. Angka tersebut adalah target kapasitas, bukan klaim jumlah data yang sudah tersedia. Policy registry mewajibkan setiap pola memiliki sumber dan validasi; sistem tidak mengisi pola sintetis hanya untuk memenuhi angka.
+Target arsitektur saat ini adalah 40.000.000 pola: 20.000.000 coding, 10.000.000 otomotif, dan 10.000.000 umum. Angka tersebut adalah target kapasitas, bukan klaim jumlah data yang sudah tersedia. Policy registry mewajibkan setiap pola memiliki sumber dan validasi; sistem tidak mengisi pola sintetis hanya untuk memenuhi angka.
 
 Sentinel memilih domain dari isi pertanyaan melalui `src/sentinel-registry.js`, kemudian mengambil pola relevan. Dataset besar harus dipasang sebagai shard terkompresi dan diindeks, bukan dimuat seluruhnya ke prompt atau RAM.
 

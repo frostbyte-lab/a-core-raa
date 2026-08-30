@@ -1,10 +1,9 @@
-export const SENTINEL_REGISTRY_VERSION = "0.1.0";
+export const SENTINEL_REGISTRY_VERSION = "0.2.0";
 
 export const SENTINEL_DOMAINS = Object.freeze({
-  general: { label: "Umum", targetPatterns: 1_000_000, keywords: ["umum", "tugas", "rencana", "ringkas", "jelaskan", "ide", "menulis", "bahasa", "matematika", "belajar"] },
-  automotive: { label: "Otomotif", targetPatterns: 1_000_000, keywords: ["mobil", "motor", "mesin", "oli", "rem", "ban", "aki", "busi", "transmisi", "obd", "kendaraan"] },
-  image: { label: "Gambar", targetPatterns: 1_000_000, keywords: ["gambar", "foto", "image", "edit", "desain", "logo", "ilustrasi", "warna", "poster", "visual"] },
-  coding: { label: "Coding", targetPatterns: 1_000_000, keywords: ["kode", "coding", "program", "javascript", "typescript", "python", "html", "css", "api", "bug", "error", "git", "database", "function"] }
+  general: { label: "Umum", targetPatterns: 10_000_000, keywords: ["umum", "tugas", "rencana", "ringkas", "jelaskan", "ide", "menulis", "bahasa", "matematika", "belajar"] },
+  automotive: { label: "Otomotif", targetPatterns: 10_000_000, keywords: ["mobil", "motor", "mesin", "oli", "rem", "ban", "aki", "busi", "transmisi", "obd", "kendaraan"] },
+  coding: { label: "Coding", targetPatterns: 20_000_000, keywords: ["kode", "coding", "program", "javascript", "typescript", "python", "html", "css", "api", "bug", "error", "git", "github", "database", "function", "drm"] }
 });
 
 function normalize(value) { return String(value ?? "").toLocaleLowerCase("id-ID").normalize("NFKC"); }
