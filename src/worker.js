@@ -89,6 +89,36 @@ export default {
         return json({ ok: true, videoPrompt: String(response?.response ?? response?.choices?.[0]?.message?.content ?? "").slice(0, 12000) });
       } catch (error) { return json({ ok: false, error: "Prompt video gagal diproses." }, 502); }
     }
+    if (apiPath === "/api/image/generate" && request.method === "POST") {
+      try {
+        if (!env.AI) return json({ ok: false, error: "Workers AI belum terhubung." }, 503);
+        const body = JSON.parse(await request.text());
+        const prompt = String(body?.prompt ?? "").slice(0, 2000);
+        if (!prompt.trim()) return json({ ok: false, error: "Prompt gambar kosong." }, 400);
+        const image = await env.AI.run("@cf/stabilityai/stable-diffusion-xl-base-1.0", { prompt, width: 1024, height: 1024, num_steps: 20 });
+        return new Response(image, { headers: { ...corsHeaders, "content-type": "image/png" } });
+      } catch (error) { return json({ ok: false, error: "Gambar tidak dapat dibuat saat ini." }, 502); }
+    }
+    if (apiPath === "/api/image/edit" && request.method === "POST") {
+      try {
+        if (!env.AI) return json({ ok: false, error: "Workers AI belum terhubung." }, 503);
+        const form = await request.formData(); const file = form.get("image"); const prompt = String(form.get("prompt") ?? "").slice(0, 2000);
+        if (!(file instanceof File) || !prompt.trim()) return json({ ok: false, error: "Gambar dan instruksi edit wajib diisi." }, 400);
+        const bytes = [...new Uint8Array(await file.arrayBuffer())];
+        const image = await env.AI.run("@cf/stabilityai/stable-diffusion-xl-base-1.0", { prompt, image: bytes, strength: 0.7, num_steps: 20 });
+        return new Response(image, { headers: { ...corsHeaders, "content-type": "image/png" } });
+      } catch (error) { return json({ ok: false, error: "Edit gambar belum didukung model atau gagal diproses." }, 502); }
+    }
+    if (apiPath === "/api/image/analyze" && request.method === "POST") {
+      try {
+        if (!env.AI) return json({ ok: false, error: "Workers AI belum terhubung." }, 503);
+        const form = await request.formData(); const file = form.get("image"); const prompt = String(form.get("prompt") ?? "Jelaskan gambar ini secara rinci dan aman.").slice(0, 2000);
+        if (!(file instanceof File)) return json({ ok: false, error: "File gambar wajib diisi." }, 400);
+        const bytes = [...new Uint8Array(await file.arrayBuffer())];
+        const response = await env.AI.run("@cf/llava-hf/llava-1.5-7b-hf", { image: bytes, prompt, max_tokens: 800 });
+        return json({ ok: true, analysis: String(response?.description ?? response?.response ?? response ?? "") });
+      } catch (error) { return json({ ok: false, error: "Analisis gambar gagal diproses." }, 502); }
+    }
     if (apiPath === "/api/analyze" && request.method === "POST") {
       try {
         const raw = await request.text();
