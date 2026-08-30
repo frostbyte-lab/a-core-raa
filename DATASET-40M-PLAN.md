@@ -9,6 +9,26 @@
 | `general` | 10.000.000 | `data/general/` | `indexes/general/` |
 | **Total** | **320.000.000** |  |  |
 
+## Subdataset coding dan internet
+
+| Subdataset | Target pola |
+|---|---:|
+| Internet dan jaringan | 30.000.000 |
+| Web, HTML, dan CSS | 30.000.000 |
+| JavaScript dan TypeScript | 30.000.000 |
+| Backend dan server | 30.000.000 |
+| API, URL, HTTP, HTTPS, DNS, dan TLS | 25.000.000 |
+| Database dan data | 25.000.000 |
+| Git dan GitHub | 20.000.000 |
+| APK dan mobile | 20.000.000 |
+| Game development dan game-resource | 25.000.000 |
+| Security, autentikasi, dan DRM sah | 20.000.000 |
+| Cloud dan DevOps | 20.000.000 |
+| Testing, debugging, dan observability | 25.000.000 |
+| **Total coding dan internet** | **300.000.000** |
+
+Routing topik dilakukan melalui `routeCodingTopics()`. Satu record dapat memiliki beberapa tag, tetapi tetap memiliki satu domain utama `coding`.
+
 ## Format record
 
 Setiap pola harus berupa satu objek JSON per baris (`.jsonl` atau `.ndjson`) dan wajib memuat `id`, `domain`, `tags`, `problem`, `solution`, `source`, `confidence`, serta `version`. Record harus mempunyai sumber yang dapat diaudit dan lisensi yang mengizinkan penggunaannya. Builder menolak record yang domainnya salah, tidak memiliki metadata wajib, atau mempunyai confidence di luar rentang 0 sampai 1.

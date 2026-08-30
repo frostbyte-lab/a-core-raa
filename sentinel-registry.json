@@ -4,7 +4,26 @@
   "role": "parent-repository",
   "targetTotalPatterns": 320000000,
   "domains": {
-    "coding": { "label": "Coding", "targetPatterns": 300000000, "path": "data/coding", "indexPath": "indexes/coding" },
+    "coding": {
+      "label": "Coding dan Internet",
+      "targetPatterns": 300000000,
+      "path": "data/coding",
+      "indexPath": "indexes/coding",
+      "subdomains": {
+        "internet-network": { "targetPatterns": 30000000, "topics": ["internet", "network", "tcp", "udp", "socket", "proxy", "router"] },
+        "web-html-css": { "targetPatterns": 30000000, "topics": ["html", "css", "dom", "accessibility", "responsive", "browser"] },
+        "javascript-typescript": { "targetPatterns": 30000000, "topics": ["javascript", "typescript", "node", "frontend", "react", "vue"] },
+        "backend-server": { "targetPatterns": 30000000, "topics": ["backend", "server", "linux", "process", "websocket", "microservice"] },
+        "api-url-http-dns": { "targetPatterns": 25000000, "topics": ["api", "url", "uri", "http", "https", "dns", "tls"] },
+        "database-data": { "targetPatterns": 25000000, "topics": ["database", "sql", "nosql", "data", "etl", "cache", "redis"] },
+        "git-github": { "targetPatterns": 20000000, "topics": ["git", "github", "repository", "branch", "commit", "actions"] },
+        "apk-mobile": { "targetPatterns": 20000000, "topics": ["apk", "android", "mobile", "kotlin", "java", "expo"] },
+        "game-development": { "targetPatterns": 25000000, "topics": ["game", "babylon", "unity", "webgl", "asset", "game-server"] },
+        "security-drm": { "targetPatterns": 20000000, "topics": ["security", "auth", "oauth", "csp", "drm", "eme", "privacy"] },
+        "cloud-devops": { "targetPatterns": 20000000, "topics": ["cloud", "docker", "kubernetes", "ci", "cd", "deployment"] },
+        "testing-debugging": { "targetPatterns": 25000000, "topics": ["test", "debug", "error", "logging", "monitoring", "observability", "performance"] }
+      }
+    },
     "automotive": { "label": "Otomotif", "targetPatterns": 10000000, "path": "data/automotive", "indexPath": "indexes/automotive" },
     "general": { "label": "Umum", "targetPatterns": 10000000, "path": "data/general", "indexPath": "indexes/general" }
   },
