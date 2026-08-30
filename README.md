@@ -6,7 +6,7 @@
 
 ## Kemampuan inti
 
-Engine melakukan redaction terhadap credential, membaca manifest dan metadata capture, menghitung missing asset, memeriksa error, resource protected, integrity/hash, dependency graph, API map, ukuran paket, serta mencocokkan evidence dengan dataset lokal berisi 20 pola game-web.
+Engine melakukan redaction terhadap credential, membaca manifest dan metadata capture, menghitung missing asset, memeriksa error, resource protected, integrity/hash, dependency graph, API map, ukuran paket, serta mencocokkan evidence dengan dataset lokal. Matcher sekarang menggunakan compact inverted-token index, sehingga tidak perlu memindai setiap pola untuk setiap evidence.
 
 Dataset saat ini mencakup network dan G1006, redirect loop, CORS, asset 404, MIME mismatch, integrity mismatch, SPA fallback, Canvas/WebGL, Web Worker, Service Worker, IndexedDB, credential-bound API, DRM/protected media, WebSocket, bundle besar, unsafe inline execution, open redirect, interaction gate, CAPTCHA/bot gate, dan archive invalid.
 
@@ -15,7 +15,9 @@ Dataset saat ini mencakup network dan G1006, redirect loop, CORS, asset 404, MIM
 | Path | Fungsi |
 |---|---|
 | `src/araa-core.js` | Rules engine, scoring, redaction, findings, priorities, explainability |
-| `src/araa-dataset.js` | Dataset lokal dan matcher pola |
+| `src/araa-dataset.js` | Dataset lokal, metadata kapasitas, dan matcher pola |
+| `src/araa-pattern-index.js` | Inverted-token index untuk corpus besar |
+| `tests/pattern-index.bench.mjs` | Benchmark 3.000.000 pola sintetis |
 | `src/araa-cli.mjs` | CLI JSON offline |
 | `tests/` | Unit dan regression tests |
 
@@ -26,6 +28,7 @@ Gunakan Node.js 20 atau lebih baru.
 ```bash
 npm test
 npm run analyze -- ./evidence.example.json ./report.json
+npm run benchmark:patterns
 ```
 
 Input CLI harus berupa JSON evidence. Contoh minimal:
@@ -40,7 +43,11 @@ Input CLI harus berupa JSON evidence. Contoh minimal:
 }
 ```
 
-Laporan berisi `score`, `level`, `findings`, `priorities`, `dataset.version`, `dataset.caseCount`, `dataset.matched`, dan `explainability`. File output ditulis dengan permission `0600` oleh CLI.
+Laporan berisi `score`, `level`, `findings`, `priorities`, `dataset.version`, `dataset.caseCount`, `dataset.capacity`, `dataset.stats`, `dataset.matched`, dan `explainability`. `dataset.caseCount` adalah jumlah pola yang benar-benar dimuat; `dataset.capacity` menyatakan kapasitas desain indeks sebesar 3.000.000 pola, bukan klaim bahwa tiga juta pengetahuan domain sudah tersedia di repository. File output ditulis dengan permission `0600` oleh CLI.
+
+## Skala pola
+
+Indeks baru memetakan token indikator ke kandidat pola menggunakan `Uint32Array`, lalu tetap melakukan verifikasi substring terhadap kandidat agar hasilnya deterministik dan kompatibel dengan matcher sebelumnya. Dengan demikian, biaya pencarian ditentukan terutama oleh token yang muncul pada evidence, bukan oleh seluruh jumlah corpus. Benchmark `npm run benchmark:patterns` membangun dan menguji 3.000.000 pola sintetis; corpus domain nyata tetap perlu dipasok sebagai data yang telah ditinjau, diberi versi, dan diuji sebelum dianggap sebagai pengetahuan A Core Raa.
 
 ## Prinsip keamanan
 

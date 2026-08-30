@@ -2,7 +2,10 @@
  * Local, synthetic domain dataset for A Core Raa.
  * This is knowledge for deterministic matching, not an external AI or API.
  */
+import { createAraaPatternIndex } from "./araa-pattern-index.js";
+
 export const ARAA_DATASET_VERSION = "2026.08.30";
+export const ARAA_PATTERN_CAPACITY = 3_000_000;
 export const ARAA_CASE_DATASET = Object.freeze([
   { id: "URL-G1006", category: "network", signal: "G1006", title: "Origin unavailable or blocked", indicators: ["G1006", "ERR_NAME_NOT_RESOLVED", "DNS", "blocked"], confidence: 0.98, action: "Periksa DNS, TLS, redirect, dan status origin; jangan mem-bypass kontrol akses." },
   { id: "URL-REDIRECT-LOOP", category: "network", signal: "redirect-loop", title: "Redirect loop", indicators: ["too many redirects", "redirect loop", "ERR_TOO_MANY_REDIRECTS"], confidence: 0.96, action: "Catat rantai redirect dan gunakan URL resmi yang berhenti pada status 2xx." },
@@ -26,8 +29,13 @@ export const ARAA_CASE_DATASET = Object.freeze([
   { id: "FORMAT-ARCHIVE", category: "packaging", signal: "archive-invalid", title: "Archive or file format invalid", indicators: ["zip", "archive", "unexpected end", "invalid header"], confidence: 0.95, action: "Validasi magic bytes, checksum, dan ukuran sebelum unpack/repack." }
 ]);
 
+const ARAA_PATTERN_INDEX = createAraaPatternIndex(ARAA_CASE_DATASET);
+
 export function matchAraaDataset(values = []) {
-  const haystack = values.map((value) => String(value ?? "").toLowerCase()).join(" ");
-  return ARAA_CASE_DATASET.filter((entry) => entry.indicators.some((indicator) => haystack.includes(indicator.toLowerCase())))
+  return ARAA_PATTERN_INDEX.match(values).map((id) => ARAA_CASE_DATASET[id])
     .map((entry) => ({ id: entry.id, category: entry.category, signal: entry.signal, title: entry.title, confidence: entry.confidence, action: entry.action }));
+}
+
+export function getAraaDatasetStats() {
+  return { loadedCaseCount: ARAA_CASE_DATASET.length, declaredCapacity: ARAA_PATTERN_CAPACITY, indexedTokens: ARAA_PATTERN_INDEX.indexedTokens };
 }

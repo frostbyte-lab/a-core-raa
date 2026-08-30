@@ -2,10 +2,10 @@
  * A Core Raa — standalone evidence intelligence for Game Collector.
  * No external model, provider, network call, or hidden execution.
  */
-import { ARAA_CASE_DATASET, ARAA_DATASET_VERSION, matchAraaDataset } from "./araa-dataset.js";
+import { ARAA_CASE_DATASET, ARAA_DATASET_VERSION, ARAA_PATTERN_CAPACITY, getAraaDatasetStats, matchAraaDataset } from "./araa-dataset.js";
 export const ARAA_IDENTITY = Object.freeze({
   name: "A Core Raa",
-  version: "1.0.0",
+  version: "1.1.0",
   owner: "Game Collector",
   mode: "standalone-evidence-intelligence",
   externalAI: false
@@ -66,6 +66,6 @@ export function analyzeAraaEvidence(input = {}) {
   const score = Math.max(0, Math.min(100, 100 - findings.reduce((sum, item) => sum + (penalties[item.severity] || 0), 0)));
   const level = score >= 85 ? "STRONG" : score >= 65 ? "CONDITIONAL" : score >= 40 ? "WEAK" : "BLOCKED";
   const priorities = findings.slice().sort((a, b) => (penalties[b.severity] || 0) - (penalties[a.severity] || 0)).map((item, index) => ({ priority: index + 1, findingId: item.id, action: item.action }));
-  return { identity: ARAA_IDENTITY, generatedAt: new Date().toISOString(), mode: "standalone", score, level, facts: [`Evidence files: ${totalFiles}`, `Missing assets: ${missing.length}`, `Errors: ${errors.length}`, `Protected resources: ${protectedItems.length}`, `API endpoints: ${api.length}`, `Dataset patterns: ${datasetSignals.length}`, `Score: ${score}/100 (${level})`], findings, priorities, dataset: { version: ARAA_DATASET_VERSION, caseCount: ARAA_CASE_DATASET.length, matched: datasetSignals }, nextAction: priorities[0]?.action || "Evidence minimum terpenuhi; lanjutkan validasi offline dan regression test.", explainability: { ruleCount: 8, datasetCaseCount: ARAA_CASE_DATASET.length, evidenceBound: true, externalProvider: false } };
+  return { identity: ARAA_IDENTITY, generatedAt: new Date().toISOString(), mode: "standalone", score, level, facts: [`Evidence files: ${totalFiles}`, `Missing assets: ${missing.length}`, `Errors: ${errors.length}`, `Protected resources: ${protectedItems.length}`, `API endpoints: ${api.length}`, `Dataset patterns matched: ${datasetSignals.length}`, `Pattern capacity: ${ARAA_PATTERN_CAPACITY}`, `Score: ${score}/100 (${level})`], findings, priorities, dataset: { version: ARAA_DATASET_VERSION, caseCount: ARAA_CASE_DATASET.length, capacity: ARAA_PATTERN_CAPACITY, stats: getAraaDatasetStats(), matched: datasetSignals }, nextAction: priorities[0]?.action || "Evidence minimum terpenuhi; lanjutkan validasi offline dan regression test.", explainability: { ruleCount: 8, datasetCaseCount: ARAA_CASE_DATASET.length, patternCapacity: ARAA_PATTERN_CAPACITY, indexedMatching: true, evidenceBound: true, externalProvider: false } };
 }
 export function buildAraaActivity(evidence = {}) { const result = analyzeAraaEvidence(evidence); return { ...result, activity: { title: "A Core Raa", subtitle: "Standalone Evidence Intelligence", status: result.level, summary: result.nextAction } }; }

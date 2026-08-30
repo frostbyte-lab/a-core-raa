@@ -1,7 +1,8 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { analyzeAraaEvidence, ARAA_IDENTITY, redactAraaEvidence } from '../src/araa-core.js';
-import { ARAA_CASE_DATASET, ARAA_DATASET_VERSION, matchAraaDataset } from '../src/araa-dataset.js';
+import { ARAA_CASE_DATASET, ARAA_DATASET_VERSION, ARAA_PATTERN_CAPACITY, getAraaDatasetStats, matchAraaDataset } from '../src/araa-dataset.js';
+import { createAraaPatternIndex } from '../src/araa-pattern-index.js';
 
 test('A Core Raa is standalone and exposes identity', () => {
   assert.equal(ARAA_IDENTITY.name, 'A Core Raa');
@@ -28,10 +29,22 @@ test('local dataset covers broad game-web failure modes', () => {
   assert.ok(matches.some((item) => item.id === 'CAPTURE-BOT-GATE'));
 });
 
+test('indexed matcher preserves exact matching semantics', () => {
+  const index = createAraaPatternIndex([
+    { indicators: ['ERR_NAME_NOT_RESOLVED', 'DNS'] },
+    { indicators: ['service worker'] },
+    { indicators: ['websocket'] }
+  ]);
+  assert.deepEqual(index.match(['DNS failure']), [0]);
+  assert.deepEqual(index.match(['service worker and websocket']), [1, 2]);
+});
+
 test('analysis reports dataset version and matched patterns', () => {
   const result = analyzeAraaEvidence({ errors: ['G1006'], api: ['wss://example.test'], security: { protectedResources: ['license'] } });
   assert.equal(result.dataset.caseCount >= 20, true);
   assert.equal(result.dataset.version, ARAA_DATASET_VERSION);
+  assert.equal(result.dataset.capacity, ARAA_PATTERN_CAPACITY);
+  assert.equal(result.dataset.stats.loadedCaseCount, ARAA_CASE_DATASET.length);
   assert.ok(result.dataset.matched.some((item) => item.id === 'URL-G1006'));
 });
 
