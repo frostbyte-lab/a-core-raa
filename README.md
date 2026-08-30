@@ -8,7 +8,7 @@
 
 Engine melakukan redaction terhadap credential, membaca manifest dan metadata capture, menghitung missing asset, memeriksa error, resource protected, integrity/hash, dependency graph, API map, ukuran paket, serta mencocokkan evidence dengan dataset lokal. Matcher sekarang menggunakan compact inverted-token index, sehingga tidak perlu memindai setiap pola untuk setiap evidence.
 
-Dataset saat ini mencakup network dan G1006, redirect loop, CORS, asset 404, MIME mismatch, integrity mismatch, SPA fallback, Canvas/WebGL, Web Worker, Service Worker, IndexedDB, credential-bound API, DRM/protected media, WebSocket, bundle besar, unsafe inline execution, open redirect, interaction gate, CAPTCHA/bot gate, dan archive invalid.
+Dataset saat ini berisi 50 pola game-web lintas network, asset, runtime, offline, API, security, capture, packaging, compatibility, dan performance, termasuk G1006, CORS, asset 404, WebAssembly, rate limit, timeout API, mixed content, CSP, HAR tidak lengkap, manifest invalid, mobile capability, memory pressure, dan CPU pressure.
 
 ## Struktur
 

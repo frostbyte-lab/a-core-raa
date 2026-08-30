@@ -20,13 +20,16 @@ test('A Core Raa redacts secret evidence', () => {
 });
 
 test('local dataset covers broad game-web failure modes', () => {
-  assert.ok(ARAA_CASE_DATASET.length >= 20);
+  assert.ok(ARAA_CASE_DATASET.length >= 50);
   assert.equal(typeof ARAA_DATASET_VERSION, 'string');
-  const matches = matchAraaDataset(['G1006', 'service worker', 'websocket', 'integrity mismatch', 'captcha']);
+  const matches = matchAraaDataset(['G1006', 'service worker', 'websocket', 'integrity mismatch', 'captcha', 'webassembly', '429 rate limit', 'mixed content']);
   assert.ok(matches.some((item) => item.id === 'URL-G1006'));
   assert.ok(matches.some((item) => item.id === 'CACHE-SW'));
   assert.ok(matches.some((item) => item.id === 'API-WEBSOCKET'));
   assert.ok(matches.some((item) => item.id === 'CAPTURE-BOT-GATE'));
+  assert.ok(matches.some((item) => item.id === 'RUNTIME-WASM'));
+  assert.ok(matches.some((item) => item.id === 'API-RATE-LIMIT'));
+  assert.ok(matches.some((item) => item.id === 'SECURITY-MIXED'));
 });
 
 test('indexed matcher preserves exact matching semantics', () => {
