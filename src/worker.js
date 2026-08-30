@@ -8,13 +8,26 @@ const CHAT_SYSTEM = "Anda adalah A Core Raa, asisten AI yang membantu dengan jel
 const CHAT_MODES = { daily: "Bantu tugas sehari-hari, perencanaan, ide, ringkasan, dan tanya jawab umum.", coding: "Bantu coding dengan contoh yang aman, lengkap, dan jelaskan asumsi serta cara mengujinya.", otomotif: "Bantu memahami otomotif dan perawatan kendaraan secara umum; jangan memberi kepastian diagnosis tanpa inspeksi profesional.", document: "Bantu meringkas, menyusun, atau merapikan dokumen; jangan menyimpan atau meminta credential.", translate: "Terjemahkan secara akurat dan pertahankan maksud serta format teks.", security: "Bantu defensive security dan mitigasi; jangan memberi instruksi untuk merusak, mencuri, atau melewati kontrol." };
 const corsHeaders = { "access-control-allow-origin": "*", "access-control-allow-methods": "GET,POST,OPTIONS", "access-control-allow-headers": "content-type", "cache-control": "no-store" };
 function json(data, status = 200) { return new Response(JSON.stringify(data), { status, headers: { ...corsHeaders, "content-type": "application/json; charset=utf-8" } }); }
+async function apiKeyMatches(request, env) {
+  const configured = String(env.ARAA_API_KEY || "");
+  if (!configured) return false;
+  const bearer = request.headers.get("authorization")?.replace(/^Bearer\s+/i, "") || "";
+  const supplied = request.headers.get("x-api-key") || bearer;
+  const [expectedHash, suppliedHash] = await Promise.all([configured, supplied].map(async (value) => crypto.subtle.digest("SHA-256", new TextEncoder().encode(value))));
+  const expected = new Uint8Array(expectedHash); const actual = new Uint8Array(suppliedHash);
+  if (expected.length !== actual.length) return false;
+  let mismatch = 0; for (let i = 0; i < expected.length; i++) mismatch |= expected[i] ^ actual[i];
+  return mismatch === 0;
+}
 
 export default {
   async fetch(request, env, ctx) {
     const url = new URL(request.url);
+    const apiPath = url.pathname.startsWith("/api/v1/") ? url.pathname.replace("/api/v1", "/api") : url.pathname;
     if (request.method === "OPTIONS") return new Response(null, { status: 204, headers: corsHeaders });
-    if (url.pathname === "/api/health" && request.method === "GET") return json({ ok: true, service: "a-core-raa-cloudflare", identity: ARAA_IDENTITY, runtime: "cloudflare-worker", evidenceModeExternalAI: false, chat: Boolean(env.AI), chatModel: CHAT_MODEL });
-    if (url.pathname === "/api/chat" && request.method === "POST") {
+    if (url.pathname.startsWith("/api/v1/") && !(await apiKeyMatches(request, env))) return json({ ok: false, error: "API key tidak valid atau belum dikonfigurasi." }, 401);
+    if (apiPath === "/api/health" && request.method === "GET") return json({ ok: true, service: "a-core-raa-cloudflare", identity: ARAA_IDENTITY, runtime: "cloudflare-worker", evidenceModeExternalAI: false, chat: Boolean(env.AI), chatModel: CHAT_MODEL });
+    if (apiPath === "/api/chat" && request.method === "POST") {
       try {
         if (!env.AI) return json({ ok: false, error: "Workers AI belum terhubung pada deployment ini." }, 503);
         const raw = await request.text();
@@ -34,7 +47,7 @@ export default {
         return json({ ok: false, error: "Chat tidak dapat diproses saat ini." }, 502);
       }
     }
-    if (url.pathname === "/api/code/analyze" && request.method === "POST") {
+    if (apiPath === "/api/code/analyze" && request.method === "POST") {
       try {
         const body = JSON.parse(await request.text());
         const code = String(body?.code ?? "").slice(0, 120000);
@@ -47,7 +60,7 @@ export default {
         return json({ ok: true, parsed, security: { score: Math.max(0, 100 - findings.length * 20), findings } });
       } catch (error) { return json({ ok: false, error: "Kode tidak valid." }, 400); }
     }
-    if (url.pathname === "/api/document/analyze" && request.method === "POST") {
+    if (apiPath === "/api/document/analyze" && request.method === "POST") {
       try {
         const body = JSON.parse(await request.text());
         const text = String(body?.text ?? "").slice(0, 120000);
@@ -55,7 +68,7 @@ export default {
         return json({ ok: true, words: text.trim() ? text.trim().split(/\s+/).length : 0, characters: text.length, hasSecret: redacted !== text, redacted: redacted.slice(0, 6000) });
       } catch (error) { return json({ ok: false, error: "Dokumen tidak valid." }, 400); }
     }
-    if (url.pathname === "/api/translate" && request.method === "POST") {
+    if (apiPath === "/api/translate" && request.method === "POST") {
       try {
         if (!env.AI) return json({ ok: false, error: "Workers AI belum terhubung." }, 503);
         const body = JSON.parse(await request.text());
@@ -66,7 +79,7 @@ export default {
         return json({ ok: true, target, translated: String(response?.response ?? response?.choices?.[0]?.message?.content ?? "").slice(0, 16000) });
       } catch (error) { return json({ ok: false, error: "Terjemahan gagal diproses." }, 502); }
     }
-    if (url.pathname === "/api/video/prompt" && request.method === "POST") {
+    if (apiPath === "/api/video/prompt" && request.method === "POST") {
       try {
         if (!env.AI) return json({ ok: false, error: "Workers AI belum terhubung." }, 503);
         const body = JSON.parse(await request.text());
@@ -76,7 +89,7 @@ export default {
         return json({ ok: true, videoPrompt: String(response?.response ?? response?.choices?.[0]?.message?.content ?? "").slice(0, 12000) });
       } catch (error) { return json({ ok: false, error: "Prompt video gagal diproses." }, 502); }
     }
-    if (url.pathname === "/api/analyze" && request.method === "POST") {
+    if (apiPath === "/api/analyze" && request.method === "POST") {
       try {
         const raw = await request.text();
         if (new TextEncoder().encode(raw).byteLength > MAX_BYTES) return json({ ok: false, error: "Evidence melebihi batas 256 KB." }, 413);

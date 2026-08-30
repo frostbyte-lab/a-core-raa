@@ -14,6 +14,13 @@ test('chat endpoint answers everyday greetings through Workers AI', async () => 
   assert.match(body.message.content, /Halo/);
 });
 
+test('v1 API requires API key and accepts Bearer key', async () => {
+  const unauthenticated = await worker.fetch(new Request('https://example.test/api/v1/health'), { AI: {} , ARAA_API_KEY: 'test-key' });
+  assert.equal(unauthenticated.status, 401);
+  const authenticated = await worker.fetch(new Request('https://example.test/api/v1/health', { headers: { authorization: 'Bearer test-key' } }), { AI: {}, ARAA_API_KEY: 'test-key' });
+  assert.equal(authenticated.status, 200);
+});
+
 test('chat endpoint refuses empty messages without AI call', async () => {
   const request = new Request('https://example.test/api/chat', { method: 'POST', body: JSON.stringify({ messages: [] }) });
   const response = await worker.fetch(request, { AI: { run: async () => ({ response: 'unexpected' }) } });

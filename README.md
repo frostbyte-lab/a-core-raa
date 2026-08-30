@@ -66,3 +66,18 @@ Repository ini merupakan fondasi AI domain-spesifik dengan dua mode: analisis ev
 Repository canonical deployment adalah `frostbyte-lab/a-core-raa`. Worker terisolasi sudah live di https://a-core-raa-cloud.technologiesfrostbyte.workers.dev dan menyediakan `GET /api/health`, `POST /api/analyze`, dan `POST /api/chat`. Worker tidak mengambil atau mengeksekusi URL yang dikirim pengguna.
 
 Workflow GitHub Actions tersedia untuk deployment otomatis setiap push ke `main`. Agar workflow otomatis dapat berjalan, tambahkan repository Actions secrets `CLOUDFLARE_API_TOKEN` dan `CLOUDFLARE_ACCOUNT_ID` melalui GitHub Repository Settings atau Git integration Cloudflare. Deployment langsung sudah diverifikasi; token integrasi GitHub pada sesi ini tidak memiliki izin menulis Actions secrets dan mengembalikan HTTP 403.
+
+## API untuk sistem lain
+
+Untuk integrasi eksternal, gunakan jalur versioned `/api/v1/`. Jalur ini memerlukan repository secret/Worker secret bernama `ARAA_API_KEY`; dashboard dan endpoint lokal lama tetap tidak berubah. Kirim key melalui header `Authorization: Bearer <API_KEY>` atau `X-API-Key: <API_KEY>`. Jangan menaruh key di frontend, repository, URL query string, atau log.
+
+Contoh pemanggilan chat:
+
+```bash
+curl -X POST https://a-core-raa-cloud.technologiesfrostbyte.workers.dev/api/v1/chat \
+  -H 'Authorization: Bearer YOUR_API_KEY' \
+  -H 'Content-Type: application/json' \
+  -d '{"message":"Bantu buat jadwal hari ini","mode":"daily"}'
+```
+
+Endpoint versioned yang tersedia adalah `/api/v1/chat`, `/api/v1/analyze`, `/api/v1/code/analyze`, `/api/v1/document/analyze`, `/api/v1/translate`, dan `/api/v1/video/prompt`. API Key saat ini merupakan satu key bersama untuk integrasi repository; rotasi dilakukan dengan mengganti secret `ARAA_API_KEY` dan melakukan deployment ulang.
