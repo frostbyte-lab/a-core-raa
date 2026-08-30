@@ -3,7 +3,7 @@ export const SENTINEL_REGISTRY_VERSION = "0.2.0";
 export const SENTINEL_DOMAINS = Object.freeze({
   general: { label: "Umum", targetPatterns: 10_000_000, keywords: ["umum", "tugas", "rencana", "ringkas", "jelaskan", "ide", "menulis", "bahasa", "matematika", "belajar"] },
   automotive: { label: "Otomotif", targetPatterns: 10_000_000, keywords: ["mobil", "motor", "mesin", "oli", "rem", "ban", "aki", "busi", "transmisi", "obd", "kendaraan"] },
-  coding: { label: "Coding", targetPatterns: 20_000_000, keywords: ["kode", "coding", "program", "javascript", "typescript", "python", "html", "css", "api", "bug", "error", "git", "github", "database", "function", "drm"] }
+  coding: { label: "Coding", targetPatterns: 300_000_000, keywords: ["kode", "coding", "program", "javascript", "typescript", "python", "html", "css", "api", "bug", "error", "git", "github", "database", "function", "drm"] }
 });
 
 function normalize(value) { return String(value ?? "").toLocaleLowerCase("id-ID").normalize("NFKC"); }

@@ -1,13 +1,13 @@
-# Rencana Dataset A Core Sentinel 40 Juta Pola
+# Rencana Dataset A Core Sentinel 320 Juta Pola
 
 ## Kuota domain
 
 | Domain | Target | Folder sumber | Folder indeks |
 |---|---:|---|---|
-| `coding` | 20.000.000 | `data/coding/` | `indexes/coding/` |
+| `coding` | 300.000.000 | `data/coding/` | `indexes/coding/` |
 | `automotive` | 10.000.000 | `data/automotive/` | `indexes/automotive/` |
 | `general` | 10.000.000 | `data/general/` | `indexes/general/` |
-| **Total** | **40.000.000** |  |  |
+| **Total** | **320.000.000** |  |  |
 
 ## Format record
 

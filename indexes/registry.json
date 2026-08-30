@@ -1,12 +1,12 @@
 {
   "version": "0.2.0",
-  "generatedAt": "2026-08-30T13:57:22.767Z",
-  "targetTotalPatterns": 20000000,
+  "generatedAt": "2026-08-30T14:00:29.936Z",
+  "targetTotalPatterns": 300000000,
   "scope": "coding",
   "domains": {
     "coding": {
       "domain": "coding",
-      "targetPatterns": 20000000,
+      "targetPatterns": 300000000,
       "records": 0,
       "invalidRecords": 0,
       "tokenCount": 0,

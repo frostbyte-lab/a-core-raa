@@ -2,9 +2,9 @@
   "registryVersion": "0.2.0",
   "name": "A Core Sentinel",
   "role": "parent-repository",
-  "targetTotalPatterns": 40000000,
+  "targetTotalPatterns": 320000000,
   "domains": {
-    "coding": { "label": "Coding", "targetPatterns": 20000000, "path": "data/coding", "indexPath": "indexes/coding" },
+    "coding": { "label": "Coding", "targetPatterns": 300000000, "path": "data/coding", "indexPath": "indexes/coding" },
     "automotive": { "label": "Otomotif", "targetPatterns": 10000000, "path": "data/automotive", "indexPath": "indexes/automotive" },
     "general": { "label": "Umum", "targetPatterns": 10000000, "path": "data/general", "indexPath": "indexes/general" }
   },
