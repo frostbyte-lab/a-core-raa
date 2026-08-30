@@ -1,0 +1,36 @@
+{
+  "version": "0.1.0",
+  "generatedAt": "2026-08-30T12:37:58.122Z",
+  "domains": {
+    "general": {
+      "domain": "general",
+      "records": 0,
+      "invalidRecords": 0,
+      "tokenCount": 0,
+      "sourceFiles": []
+    },
+    "automotive": {
+      "domain": "automotive",
+      "records": 0,
+      "invalidRecords": 0,
+      "tokenCount": 0,
+      "sourceFiles": []
+    },
+    "image": {
+      "domain": "image",
+      "records": 0,
+      "invalidRecords": 0,
+      "tokenCount": 0,
+      "sourceFiles": []
+    },
+    "coding": {
+      "domain": "coding",
+      "records": 0,
+      "invalidRecords": 0,
+      "tokenCount": 0,
+      "sourceFiles": []
+    }
+  },
+  "totalRecords": 0,
+  "invalidRecords": 0
+}

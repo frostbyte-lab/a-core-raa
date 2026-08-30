@@ -89,3 +89,7 @@ Repository ini adalah induk A Core Sentinel dengan empat domain: `general`, `aut
 Target arsitektur saat ini adalah 4.000.000 pola, yaitu 1.000.000 pola per domain. Angka tersebut adalah target kapasitas, bukan klaim jumlah data yang sudah tersedia. Policy registry mewajibkan setiap pola memiliki sumber dan validasi; sistem tidak mengisi pola sintetis hanya untuk memenuhi angka.
 
 Sentinel memilih domain dari isi pertanyaan melalui `src/sentinel-registry.js`, kemudian mengambil pola relevan. Dataset besar harus dipasang sebagai shard terkompresi dan diindeks, bukan dimuat seluruhnya ke prompt atau RAM.
+
+### Build index pola
+
+Pola nyata harus disimpan sebagai file `.jsonl` di folder domain yang sesuai. Jalankan `npm run patterns:build` untuk memvalidasi record, membuat token index per domain, dan menghasilkan statistik di `indexes/registry.json`. Builder menolak record tanpa sumber, confidence, domain, problem, atau solution; builder tidak membuat data sintetis.
