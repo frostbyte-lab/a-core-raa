@@ -1,0 +1,18 @@
+{
+  "registryVersion": "0.1.0",
+  "name": "A Core Sentinel",
+  "role": "parent-repository",
+  "targetTotalPatterns": 4000000,
+  "domains": {
+    "general": { "targetPatterns": 1000000, "path": "data/general", "indexPath": "indexes/general" },
+    "automotive": { "targetPatterns": 1000000, "path": "data/automotive", "indexPath": "indexes/automotive" },
+    "image": { "targetPatterns": 1000000, "path": "data/image", "indexPath": "indexes/image" },
+    "coding": { "targetPatterns": 1000000, "path": "data/coding", "indexPath": "indexes/coding" }
+  },
+  "policy": {
+    "doNotInventPatterns": true,
+    "requireSource": true,
+    "requireValidation": true,
+    "runtimeRetrievalLimit": 200
+  }
+}

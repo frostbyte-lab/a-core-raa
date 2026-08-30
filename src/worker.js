@@ -1,4 +1,5 @@
 import { analyzeAraaEvidence, ARAA_IDENTITY } from "./araa-core.js";
+import { routeSentinelDomains, registrySummary } from "./sentinel-registry.js";
 
 const MAX_BYTES = 256 * 1024;
 const MAX_CHAT_BYTES = 32 * 1024;
@@ -26,7 +27,7 @@ export default {
     const apiPath = url.pathname.startsWith("/api/v1/") ? url.pathname.replace("/api/v1", "/api") : url.pathname;
     if (request.method === "OPTIONS") return new Response(null, { status: 204, headers: corsHeaders });
     if (url.pathname.startsWith("/api/v1/") && !(await apiKeyMatches(request, env))) return json({ ok: false, error: "API key tidak valid atau belum dikonfigurasi." }, 401);
-    if (apiPath === "/api/health" && request.method === "GET") return json({ ok: true, service: "a-core-raa-cloudflare", identity: ARAA_IDENTITY, runtime: "cloudflare-worker", evidenceModeExternalAI: false, chat: Boolean(env.AI), chatModel: CHAT_MODEL });
+    if (apiPath === "/api/health" && request.method === "GET") return json({ ok: true, service: "a-core-sentinel", identity: ARAA_IDENTITY, runtime: "cloudflare-worker", evidenceModeExternalAI: false, chat: Boolean(env.AI), chatModel: CHAT_MODEL, registry: registrySummary() });
     if (apiPath === "/api/chat" && request.method === "POST") {
       try {
         if (!env.AI) return json({ ok: false, error: "Workers AI belum terhubung pada deployment ini." }, 503);
@@ -38,11 +39,13 @@ export default {
         const messages = incoming.slice(-MAX_CHAT_MESSAGES);
         const clean = messages.map((item) => ({ role: item?.role === "assistant" ? "assistant" : "user", content: String(item?.content ?? "").replace(/[\x00-\x1f]/g, " ").slice(0, 4000) })).filter((item) => item.content.trim());
         if (!clean.length) return json({ ok: false, error: "Pesan chat kosong." }, 400);
-        const system = `${CHAT_SYSTEM} Mode aktif: ${CHAT_MODES[mode]} Selalu prioritaskan relevansi terhadap permintaan terakhir, jangan menambahkan fitur atau klaim yang tidak diminta, dan akhiri setelah jawaban selesai.`;
+        const routing = routeSentinelDomains(clean.at(-1)?.content, mode === "daily" ? undefined : mode);
+        const routedDomains = routing.selected.map((domain) => registrySummary().domains[domain].label).join(", ");
+        const system = `${CHAT_SYSTEM} Mode aktif: ${CHAT_MODES[mode]} Domain pengetahuan terpilih: ${routedDomains}. Gunakan domain itu hanya sebagai arah relevansi; jangan mengklaim memiliki data yang tidak diberikan. Selalu prioritaskan relevansi terhadap permintaan terakhir, jangan menambahkan fitur atau klaim yang tidak diminta, dan akhiri setelah jawaban selesai.`;
         const response = await env.AI.run(CHAT_MODEL, { messages: [{ role: "system", content: system }, ...clean], chat_template_kwargs: { enable_thinking: false } });
         const answer = response?.response ?? response?.choices?.[0]?.message?.content;
         if (!answer) return json({ ok: false, error: "Model tidak menghasilkan jawaban." }, 502);
-        return json({ ok: true, model: CHAT_MODEL, mode, message: { role: "assistant", content: String(answer).slice(0, 12000) }, answer: String(answer).slice(0, 12000) });
+        return json({ ok: true, model: CHAT_MODEL, mode, routing, message: { role: "assistant", content: String(answer).slice(0, 12000) }, answer: String(answer).slice(0, 12000) });
       } catch (error) {
         return json({ ok: false, error: "Chat tidak dapat diproses saat ini." }, 502);
       }

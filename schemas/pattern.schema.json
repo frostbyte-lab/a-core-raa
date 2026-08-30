@@ -1,0 +1,19 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "A Core Sentinel Pattern",
+  "type": "object",
+  "required": ["id", "domain", "tags", "problem", "solution", "source", "confidence", "version"],
+  "properties": {
+    "id": { "type": "string", "minLength": 3 },
+    "domain": { "enum": ["general", "automotive", "image", "coding"] },
+    "tags": { "type": "array", "items": { "type": "string" }, "minItems": 1 },
+    "problem": { "type": "string", "minLength": 1 },
+    "solution": { "type": "string", "minLength": 1 },
+    "example": { "type": "string" },
+    "source": { "type": "string", "minLength": 1 },
+    "confidence": { "type": "number", "minimum": 0, "maximum": 1 },
+    "version": { "type": "string", "minLength": 1 },
+    "tests": { "type": "array", "items": { "type": "string" } }
+  },
+  "additionalProperties": false
+}

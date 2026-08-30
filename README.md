@@ -81,3 +81,11 @@ curl -X POST https://a-core-raa-cloud.technologiesfrostbyte.workers.dev/api/v1/c
 ```
 
 Endpoint versioned yang tersedia adalah `/api/v1/chat`, `/api/v1/analyze`, `/api/v1/code/analyze`, `/api/v1/document/analyze`, `/api/v1/translate`, dan `/api/v1/video/prompt`. API Key saat ini merupakan satu key bersama untuk integrasi repository; rotasi dilakukan dengan mengganti secret `ARAA_API_KEY` dan melakukan deployment ulang.
+
+## A Core Sentinel sebagai repository induk
+
+Repository ini adalah induk A Core Sentinel dengan empat domain: `general`, `automotive`, `image`, dan `coding`. Registry pusat berada di `sentinel-registry.json`, schema pola berada di `schemas/pattern.schema.json`, dan dataset domain disiapkan di `data/` dengan index terpisah di `indexes/`.
+
+Target arsitektur saat ini adalah 4.000.000 pola, yaitu 1.000.000 pola per domain. Angka tersebut adalah target kapasitas, bukan klaim jumlah data yang sudah tersedia. Policy registry mewajibkan setiap pola memiliki sumber dan validasi; sistem tidak mengisi pola sintetis hanya untuk memenuhi angka.
+
+Sentinel memilih domain dari isi pertanyaan melalui `src/sentinel-registry.js`, kemudian mengambil pola relevan. Dataset besar harus dipasang sebagai shard terkompresi dan diindeks, bukan dimuat seluruhnya ke prompt atau RAM.
