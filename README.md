@@ -63,6 +63,13 @@ Tahap berikutnya dapat menambahkan parser evidence adapters, root-cause graph, c
 
 Repository ini merupakan fondasi AI domain-spesifik dengan dua mode: analisis evidence yang dapat diaudit dan asisten chat harian. Ia bukan klaim bahwa sistem lebih pintar dari seluruh model AI umum; targetnya adalah analisis game-resource yang konsisten, dapat diaudit, aman, dan teliti.
 
+## Komponen orchestrator Xentinel
+
+Modul `src/xentinel-orchestrator.js` menghubungkan router mode, retrieval pola lokal, memory session terbatas 30 menit, dan metrik request ke endpoint chat Worker. Frontend menyimpan `sessionId` acak di browser agar konteks percakapan dapat dipakai ulang tanpa menyimpan credential. Retrieval hanya menggunakan pola lokal yang cocok; ia tidak mengklaim memiliki pengetahuan yang tidak ada di evidence atau dataset.
+
+Endpoint `GET /api/metrics` menyediakan metrik runtime sederhana untuk health check dan observability. Endpoint ini tidak menyimpan isi pesan. Tools analisis kode, dokumen, dan evidence tetap dibatasi pada input yang diberikan pengguna, sedangkan credential-like fields diproses dengan redaction.
+
+
 ## Cloudflare deployment
 
 Repository canonical deployment adalah `frostbyte-lab/a-core-raa`. Worker terisolasi sudah live di https://a-core-raa-cloud.technologiesfrostbyte.workers.dev dan menyediakan `GET /api/health`, `POST /api/analyze`, dan `POST /api/chat`. Worker tidak mengambil atau mengeksekusi URL yang dikirim pengguna.

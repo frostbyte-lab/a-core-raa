@@ -4,6 +4,7 @@ import { analyzeAraaEvidence, ARAA_IDENTITY, redactAraaEvidence } from '../src/a
 import { ARAA_CASE_DATASET, ARAA_DATASET_VERSION, ARAA_PATTERN_CAPACITY, getAraaDatasetStats, matchAraaDataset } from '../src/araa-dataset.js';
 import { createAraaPatternIndex } from '../src/araa-pattern-index.js';
 import worker from '../src/worker.js';
+import { orchestrateChat } from '../src/xentinel-orchestrator.js';
 
 test('chat endpoint answers everyday greetings through Workers AI', async () => {
   const request = new Request('https://example.test/api/chat', { method: 'POST', body: JSON.stringify({ messages: [{ role: 'user', content: 'Halo' }] }) });
@@ -12,6 +13,13 @@ test('chat endpoint answers everyday greetings through Workers AI', async () => 
   assert.equal(response.status, 200);
   assert.equal(body.ok, true);
   assert.match(body.message.content, /Halo/);
+});
+
+test('orchestrator routes coding query and returns local retrieval', () => {
+  const result = orchestrateChat({ sessionId: 'test-session', messages: [{ role: 'user', content: 'Bagaimana memperbaiki error CORS pada API HTML?' }], mode: 'coding' });
+  assert.equal(result.memory.sessionId, 'test-session');
+  assert.ok(result.routing.selected.length > 0);
+  assert.ok(result.retrieval.some((item) => item.id === 'URL-CORS' || item.id === 'API-CORS'));
 });
 
 test('v1 API requires API key and accepts Bearer key', async () => {

@@ -1,5 +1,6 @@
 import { analyzeAraaEvidence, ARAA_IDENTITY } from "./araa-core.js";
 import { routeSentinelDomains, registrySummary } from "./sentinel-registry.js";
+import { getMetrics, orchestrateChat, recordMetric } from "./xentinel-orchestrator.js";
 
 const MAX_BYTES = 256 * 1024;
 const MAX_CHAT_BYTES = 32 * 1024;
@@ -36,20 +37,24 @@ export default {
         const body = JSON.parse(raw);
         const mode = Object.hasOwn(CHAT_MODES, body?.mode) ? body.mode : "daily";
         const incoming = Array.isArray(body?.messages) ? body.messages : [{ role: "user", content: body?.message }];
-        const messages = incoming.slice(-MAX_CHAT_MESSAGES);
+        const orchestration = orchestrateChat({ sessionId: body?.sessionId, messages: incoming, mode });
+        const messages = orchestration.messages.slice(-MAX_CHAT_MESSAGES);
         const clean = messages.map((item) => ({ role: item?.role === "assistant" ? "assistant" : "user", content: String(item?.content ?? "").replace(/[\x00-\x1f]/g, " ").slice(0, 4000) })).filter((item) => item.content.trim());
         if (!clean.length) return json({ ok: false, error: "Pesan chat kosong." }, 400);
-        const routing = routeSentinelDomains(clean.at(-1)?.content, mode === "daily" ? undefined : mode);
-        const routedDomains = routing.selected.map((domain) => registrySummary().domains[domain].label).join(", ");
-        const system = `${CHAT_SYSTEM} Mode aktif: ${CHAT_MODES[mode]} Domain pengetahuan terpilih: ${routedDomains}. Gunakan domain itu hanya sebagai arah relevansi; jangan mengklaim memiliki data yang tidak diberikan. Selalu prioritaskan relevansi terhadap permintaan terakhir, jangan menambahkan fitur atau klaim yang tidak diminta, dan akhiri setelah jawaban selesai.`;
+        const routing = orchestration.routing;
+        const routedDomains = orchestration.selectedDomains.join(", ");
+        const retrieved = orchestration.retrieval.map((item) => `${item.id}: ${item.title} — ${item.action}`).join(" | ");
+        const system = `${CHAT_SYSTEM} Mode aktif: ${CHAT_MODES[mode]} Domain pengetahuan terpilih: ${routedDomains}. Pola lokal relevan: ${retrieved || "tidak ada pola langsung"}. Gunakan pola hanya sebagai arah relevansi; jangan mengklaim memiliki data yang tidak diberikan. Selalu prioritaskan relevansi terhadap permintaan terakhir, jangan menambahkan fitur atau klaim yang tidak diminta, dan akhiri setelah jawaban selesai.`;
         const response = await env.AI.run(CHAT_MODEL, { messages: [{ role: "system", content: system }, ...clean], chat_template_kwargs: { enable_thinking: false } });
         const answer = response?.response ?? response?.choices?.[0]?.message?.content;
         if (!answer) return json({ ok: false, error: "Model tidak menghasilkan jawaban." }, 502);
-        return json({ ok: true, model: CHAT_MODEL, mode, routing, message: { role: "assistant", content: String(answer).slice(0, 12000) }, answer: String(answer).slice(0, 12000) });
+        recordMetric("chat");
+        return json({ ok: true, model: CHAT_MODEL, mode, routing, retrieval: orchestration.retrieval, memory: orchestration.memory, message: { role: "assistant", content: String(answer).slice(0, 12000) }, answer: String(answer).slice(0, 12000) });
       } catch (error) {
         return json({ ok: false, error: "Chat tidak dapat diproses saat ini." }, 502);
       }
     }
+    if (apiPath === "/api/metrics" && request.method === "GET") return json({ ok: true, metrics: getMetrics() });
     if (apiPath === "/api/code/analyze" && request.method === "POST") {
       try {
         const body = JSON.parse(await request.text());
