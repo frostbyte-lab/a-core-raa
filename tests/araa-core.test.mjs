@@ -3,6 +3,22 @@ import assert from 'node:assert/strict';
 import { analyzeAraaEvidence, ARAA_IDENTITY, redactAraaEvidence } from '../src/araa-core.js';
 import { ARAA_CASE_DATASET, ARAA_DATASET_VERSION, ARAA_PATTERN_CAPACITY, getAraaDatasetStats, matchAraaDataset } from '../src/araa-dataset.js';
 import { createAraaPatternIndex } from '../src/araa-pattern-index.js';
+import worker from '../src/worker.js';
+
+test('chat endpoint answers everyday greetings through Workers AI', async () => {
+  const request = new Request('https://example.test/api/chat', { method: 'POST', body: JSON.stringify({ messages: [{ role: 'user', content: 'Halo' }] }) });
+  const response = await worker.fetch(request, { AI: { run: async (model, input) => ({ response: `Hai dari ${model}: ${input.messages.at(-1).content}` }) } });
+  const body = await response.json();
+  assert.equal(response.status, 200);
+  assert.equal(body.ok, true);
+  assert.match(body.message.content, /Halo/);
+});
+
+test('chat endpoint refuses empty messages without AI call', async () => {
+  const request = new Request('https://example.test/api/chat', { method: 'POST', body: JSON.stringify({ messages: [] }) });
+  const response = await worker.fetch(request, { AI: { run: async () => ({ response: 'unexpected' }) } });
+  assert.equal(response.status, 400);
+});
 
 test('A Core Raa is standalone and exposes identity', () => {
   assert.equal(ARAA_IDENTITY.name, 'A Core Raa');
