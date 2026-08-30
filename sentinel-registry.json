@@ -2,8 +2,9 @@
   "registryVersion": "0.2.0",
   "name": "A Core Sentinel",
   "role": "parent-repository",
-  "targetTotalPatterns": 320000000,
+  "targetTotalPatterns": 30320000000,
   "domains": {
+    "internet": { "label": "Internet", "targetPatterns": 30000000000, "manifestPath": "internet-shard-manifest.json", "shardPattern": "frostbyte-lab/raa-{n}", "shardCount": 30 },
     "coding": {
       "label": "Coding dan Internet",
       "targetPatterns": 300000000,

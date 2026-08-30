@@ -16,6 +16,7 @@ export const CODING_SUBDOMAINS = Object.freeze({
 });
 
 export const SENTINEL_DOMAINS = Object.freeze({
+  internet: { label: "Internet", targetPatterns: 30_000_000_000, keywords: ["internet", "url", "uri", "http", "https", "dns", "tls", "tcp", "ip", "network", "server", "website", "web"] },
   general: { label: "Umum", targetPatterns: 10_000_000, keywords: ["umum", "tugas", "rencana", "ringkas", "jelaskan", "ide", "menulis", "bahasa", "matematika", "belajar"] },
   automotive: { label: "Otomotif", targetPatterns: 10_000_000, keywords: ["mobil", "motor", "mesin", "oli", "rem", "ban", "aki", "busi", "transmisi", "obd", "kendaraan"] },
   coding: { label: "Coding", targetPatterns: 300_000_000, keywords: ["kode", "coding", "program", "javascript", "typescript", "python", "html", "css", "api", "bug", "error", "git", "github", "database", "function", "drm"] }
