@@ -6,13 +6,17 @@ import { createAraaPatternIndex } from '../src/araa-pattern-index.js';
 import worker from '../src/worker.js';
 import { orchestrateChat } from '../src/xentinel-orchestrator.js';
 
-test('chat endpoint answers everyday greetings through Workers AI', async () => {
-  const request = new Request('https://example.test/api/chat', { method: 'POST', body: JSON.stringify({ messages: [{ role: 'user', content: 'Halo' }] }) });
-  const response = await worker.fetch(request, { AI: { run: async (model, input) => ({ response: `Hai dari ${model}: ${input.messages.at(-1).content}` }) } });
-  const body = await response.json();
-  assert.equal(response.status, 200);
-  assert.equal(body.ok, true);
-  assert.match(body.message.content, /Halo/);
+test('chat endpoint answers everyday greetings through OpenRouter', async () => {
+  const originalFetch = globalThis.fetch;
+  globalThis.fetch = async () => new Response(JSON.stringify({ model: 'openrouter/free', choices: [{ message: { role: 'assistant', content: 'Hai dari OpenRouter: Halo' } }] }), { status: 200, headers: { 'content-type': 'application/json' } });
+  try {
+    const request = new Request('https://example.test/api/chat', { method: 'POST', body: JSON.stringify({ messages: [{ role: 'user', content: 'Halo' }] }) });
+    const response = await worker.fetch(request, { OPENROUTER_API_KEY: 'test-key' });
+    const body = await response.json();
+    assert.equal(response.status, 200);
+    assert.equal(body.ok, true);
+    assert.match(body.message.content, /Halo/);
+  } finally { globalThis.fetch = originalFetch; }
 });
 
 test('orchestrator routes coding query and returns local retrieval', () => {
@@ -31,7 +35,7 @@ test('v1 API requires API key and accepts Bearer key', async () => {
 
 test('chat endpoint refuses empty messages without AI call', async () => {
   const request = new Request('https://example.test/api/chat', { method: 'POST', body: JSON.stringify({ messages: [] }) });
-  const response = await worker.fetch(request, { AI: { run: async () => ({ response: 'unexpected' }) } });
+  const response = await worker.fetch(request, { OPENROUTER_API_KEY: 'test-key' });
   assert.equal(response.status, 400);
 });
 

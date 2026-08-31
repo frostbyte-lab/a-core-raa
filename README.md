@@ -2,7 +2,7 @@
 
 > Xentinel adalah branding publik untuk engine A Core Raa.
 
-**A Core Raa** adalah engine intelligence untuk analisis evidence resource game web dan chat tugas sehari-hari. Mode evidence tetap offline-deterministik; mode chat menggunakan binding resmi Cloudflare Workers AI.
+**A Core Raa** adalah engine intelligence untuk analisis evidence resource game web dan chat tugas sehari-hari. Mode evidence tetap offline-deterministik; mode chat menggunakan API OpenRouter yang dikonfigurasi melalui secret Worker.
 
 > A Core Raa tidak menebak isi game. Ia hanya membuat kesimpulan dari evidence yang diberikan, mencocokkan pola lokal, memberi tingkat risiko, dan menjelaskan tindakan yang aman.
 
@@ -53,7 +53,7 @@ Indeks baru memetakan token indikator ke kandidat pola menggunakan `Uint32Array`
 
 ## Prinsip keamanan
 
-Mode evidence A Core Raa berjalan offline dan tidak melakukan fetch otomatis. Mode chat hanya mengirim riwayat percakapan yang dibatasi ke Workers AI melalui binding Cloudflare; credential-like fields tetap dilarang dan tidak disimpan. Credential-like fields di-redact sebelum diproses. CAPTCHA, DRM, protected resource, dan kontrol akses tidak dilewati. Evidence tidak dianggap sebagai instruksi eksekusi. Input dibatasi kedalaman, panjang string, jumlah array, dan jumlah object key untuk mengurangi risiko resource exhaustion.
+Mode evidence A Core Raa berjalan offline dan tidak melakukan fetch otomatis. Mode chat hanya mengirim riwayat percakapan yang dibatasi ke OpenRouter melalui HTTPS; credential-like fields tetap dilarang dan tidak disimpan. Credential-like fields di-redact sebelum diproses. CAPTCHA, DRM, protected resource, dan kontrol akses tidak dilewati. Evidence tidak dianggap sebagai instruksi eksekusi. Input dibatasi kedalaman, panjang string, jumlah array, dan jumlah object key untuk mengurangi risiko resource exhaustion.
 
 ## Roadmap
 
@@ -72,7 +72,7 @@ Endpoint `GET /api/metrics` menyediakan metrik runtime sederhana untuk health ch
 
 ## Cloudflare deployment
 
-Repository canonical deployment adalah `frostbyte-lab/a-core-raa`. Worker terisolasi sudah live di https://a-core-raa-cloud.technologiesfrostbyte.workers.dev dan menyediakan `GET /api/health`, `POST /api/analyze`, dan `POST /api/chat`. Worker tidak mengambil atau mengeksekusi URL yang dikirim pengguna.
+Repository canonical deployment adalah `frostbyte-lab/a-core-raa`. Worker terisolasi sudah live di https://a-core-raa-cloud.technologiesfrostbyte.workers.dev dan menyediakan `GET /api/health`, `POST /api/analyze`, dan `POST /api/chat`. Endpoint generatif menggunakan OpenRouter ketika secret `OPENROUTER_API_KEY` tersedia. Worker tidak mengambil atau mengeksekusi URL yang dikirim pengguna.
 
 Workflow GitHub Actions tersedia untuk deployment otomatis setiap push ke `main`. Agar workflow otomatis dapat berjalan, tambahkan repository Actions secrets `CLOUDFLARE_API_TOKEN` dan `CLOUDFLARE_ACCOUNT_ID` melalui GitHub Repository Settings atau Git integration Cloudflare. Deployment langsung sudah diverifikasi; token integrasi GitHub pada sesi ini tidak memiliki izin menulis Actions secrets dan mengembalikan HTTP 403.
 
@@ -103,3 +103,13 @@ Sentinel memilih domain dari isi pertanyaan melalui `src/sentinel-registry.js`, 
 
 Pola nyata harus disimpan sebagai file `.jsonl` di folder domain yang sesuai. Jalankan `npm run patterns:build` untuk memvalidasi record, membuat token index per domain, dan menghasilkan statistik di `indexes/registry.json`. Builder menolak record tanpa sumber, confidence, domain, problem, atau solution; builder tidak membuat data sintetis.
 
+
+## OpenRouter model gateway
+
+Seluruh endpoint generatif (`/api/chat`, `/api/translate`, `/api/video/prompt`, serta endpoint gambar) menggunakan adapter `src/openrouter.js`. Adapter memakai `POST https://openrouter.ai/api/v1/chat/completions`, Bearer API key, timeout, dan parser respons yang seragam. Model default adalah `openrouter/free`; model dapat diganti melalui variable `OPENROUTER_MODEL` tanpa mengubah kode.
+
+Untuk mengaktifkan model pada deployment Cloudflare, buat repository secret GitHub bernama `OPENROUTER_API_KEY`. Workflow deployment akan memasangnya sebagai Worker secret secara otomatis. Jangan menaruh API key di source code, `wrangler.toml`, frontend, URL, atau commit. Endpoint `GET /api/health` melaporkan `provider: "openrouter"`, model aktif, dan apakah secret sudah terkonfigurasi.
+
+OpenRouter menggunakan endpoint OpenAI-compatible `https://openrouter.ai/api/v1/chat/completions` dan autentikasi Bearer. Model gratis dapat memiliki batas rate, ketersediaan, dan kemampuan multimodal yang berbeda; endpoint gambar akan mengembalikan pesan yang jelas jika model yang dipilih tidak mendukung output gambar.
+
+Referensi resmi: https://openrouter.ai/docs/quickstart dan https://openrouter.ai/docs/api_reference/authentication.

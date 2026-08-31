@@ -7,5 +7,6 @@ workers_dev = true
 directory = "./public"
 binding = "ASSETS"
 
-[ai]
-binding = "AI"
+[vars]
+OPENROUTER_MODEL = "openrouter/free"
+OPENROUTER_SITE_URL = "https://a-core-raa-cloud.technologiesfrostbyte.workers.dev"
