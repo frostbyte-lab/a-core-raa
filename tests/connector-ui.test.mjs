@@ -6,9 +6,12 @@ const html = await readFile(new URL('../public/index.html', import.meta.url), 'u
 
 test('Xentinel logo and connector controls are present', async () => {
   assert.match(html, /src="\/xentinel-logo\.jpg"/);
-  assert.match(html, /id="attach-open"/);
+  assert.match(html, /id="chat-attach-open"/);
   assert.match(html, /id="connector-open"/);
   assert.match(html, /id="connector-search"/);
+  assert.match(html, /Koneksi API/);
+  assert.match(html, /data-panel="portfolio"/);
+  assert.doesNotMatch(html, /id="attach-open"/);
   assert.match(html, /GitHub/);
   assert.match(html, /WhatsApp Business/);
   assert.match(html, /Terhubung \(sesi lokal\)/);
