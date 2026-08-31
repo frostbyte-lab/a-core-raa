@@ -9,6 +9,7 @@
     "analyze": "node src/araa-cli.mjs",
     "benchmark:patterns": "node tests/pattern-index.bench.mjs",
     "patterns:build": "node scripts/build-pattern-index.mjs",
+    "data-seat:shard": "node scripts/shard-data-seat.mjs",
     "deploy": "wrangler deploy"
   },
   "engines": { "node": ">=20" },
