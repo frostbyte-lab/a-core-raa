@@ -1,0 +1,9 @@
+{
+  "domain": "internet",
+  "targetPatterns": 30000000000,
+  "records": 0,
+  "invalidRecords": 0,
+  "tokenCount": 0,
+  "sourceFiles": [],
+  "storage": "jsonl-stream"
+}

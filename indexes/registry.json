@@ -1,9 +1,18 @@
 {
   "version": "0.2.0",
-  "generatedAt": "2026-08-30T16:14:29.748Z",
-  "targetTotalPatterns": 300000000,
-  "scope": "coding",
+  "generatedAt": "2026-08-31T14:36:35.512Z",
+  "targetTotalPatterns": 30320000000,
+  "scope": "all",
   "domains": {
+    "internet": {
+      "domain": "internet",
+      "targetPatterns": 30000000000,
+      "records": 0,
+      "invalidRecords": 0,
+      "tokenCount": 0,
+      "sourceFiles": [],
+      "storage": "jsonl-stream"
+    },
     "coding": {
       "domain": "coding",
       "targetPatterns": 300000000,
@@ -13,6 +22,24 @@
       "sourceFiles": [
         "data/coding/coding-internet-000001.jsonl"
       ],
+      "storage": "jsonl-stream"
+    },
+    "automotive": {
+      "domain": "automotive",
+      "targetPatterns": 10000000,
+      "records": 0,
+      "invalidRecords": 0,
+      "tokenCount": 0,
+      "sourceFiles": [],
+      "storage": "jsonl-stream"
+    },
+    "general": {
+      "domain": "general",
+      "targetPatterns": 10000000,
+      "records": 0,
+      "invalidRecords": 0,
+      "tokenCount": 0,
+      "sourceFiles": [],
       "storage": "jsonl-stream"
     }
   },
