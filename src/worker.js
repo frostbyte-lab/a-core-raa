@@ -56,6 +56,12 @@ export default {
         return json({ ok: false, error: "Chat tidak dapat diproses saat ini." }, 502);
       }
     }
+    if (apiPath === "/api/data-seat/status" && request.method === "GET") {
+      const configured = String(env.DATA_SEAT_KEY || "");
+      const supplied = request.headers.get("x-data-seat-key") || "";
+      if (!configured || !(await apiKeyMatches(new Request(request.url, { headers: { "x-api-key": supplied } }), { ARAA_API_KEY: configured }))) return json({ ok: false, error: "Access code Data Seat tidak valid." }, 401);
+      return json({ ok: true, mode: "server-side-index", capacity: env.DATA_SEAT_CAPACITY || "jutaan", message: "Data Seat siap menerima dataset tervalidasi." });
+    }
     if (apiPath === "/api/metrics" && request.method === "GET") return json({ ok: true, metrics: getMetrics() });
     if (apiPath === "/api/code/analyze" && request.method === "POST") {
       try {
