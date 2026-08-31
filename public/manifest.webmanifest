@@ -1,0 +1,17 @@
+{
+  "name": "Xentinel AI",
+  "short_name": "Xentinel",
+  "description": "Xentinel AI workspace by Frostbyte Tech",
+  "lang": "id-ID",
+  "start_url": "/?source=pwa",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "portrait-primary",
+  "theme_color": "#090909",
+  "background_color": "#090909",
+  "categories": ["productivity", "education", "utilities"],
+  "icons": [
+    {"src":"/icons/xentinel-192.png","sizes":"192x192","type":"image/png","purpose":"any maskable"},
+    {"src":"/icons/xentinel-512.png","sizes":"512x512","type":"image/png","purpose":"any maskable"}
+  ]
+}
