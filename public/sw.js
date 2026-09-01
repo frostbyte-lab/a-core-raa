@@ -1,4 +1,4 @@
-const CACHE = 'xentinel-shell-v2';
+const CACHE = 'xentinel-shell-v3';
 const SHELL = ['/manifest.webmanifest', '/xentinel-logo.jpg', '/icons/xentinel-192.png', '/icons/xentinel-512.png'];
 
 self.addEventListener('install', event => {
