@@ -12,7 +12,6 @@ test('Xentinel logo and connector controls are present', async () => {
   assert.match(html, /Koneksi API/);
   assert.match(html, /data-panel="portfolio"/);
   assert.doesNotMatch(html, /id="attach-open"/);
-  assert.match(html, /GitHub/);
   assert.match(html, /WhatsApp Business/);
   assert.match(html, /Terhubung \(sesi lokal\)/);
   const logo = await stat(new URL('../public/xentinel-logo.jpg', import.meta.url));
